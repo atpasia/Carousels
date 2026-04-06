@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>carousel</title>
+<!-- GENERATOR_DATA:{"slides":[{"url":"https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/9a88b6cc-44c9-4c48-9a63-462f7517fadc/Placeholder_images-11.png?t=1775328240","caption":"vertical testing 2222"},{"url":"https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/8e27f1f3-4953-487a-9ffe-40232e20b9c3/Placeholder_images-07.png?t=1775328244","caption":"testing for testing"},{"url":"https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/8969cf50-00ae-4693-9f5f-a2fa2dacc071/Placeholder_images-13.png?t=1775328240 ","caption":""}],"filename":"","captionStyle":{"font":"'Inter', sans-serif","size":"14","color":"#669c35","bold":false,"italic":true,"underline":false,"lh":"1.6"}}:END_GENERATOR_DATA -->
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: transparent; width: 100%; overflow-x: hidden; }
+  .carousel-wrap { width: 100%; }
+  .carousel-viewport { position: relative; width: 100%; overflow: hidden; }
+  .carousel-track { display: flex; transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); will-change: transform; }
+  .slide { min-width: 100%; aspect-ratio: 4/3; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f0f0f0; }
+  .slide img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; display: block; }
+  .slide img.landscape { width: 100%; height: 100%; object-fit: cover; }
+  .caption-area { padding: 12px 0 0; min-height: 40px; }
+  .caption-sub { font-family:'Inter', sans-serif;font-size:14px;color:#669c35;font-weight:400;font-style:italic;text-decoration:none;line-height:1.6; text-align: center; min-height: 1em; }
+  .controls { display: flex; align-items: center; justify-content: space-between; padding: 12px 2px 0; }
+  .dots { display: flex; gap: 6px; align-items: center; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; cursor: pointer; transition: all 0.3s ease; border: none; padding: 0; }
+  .dot.active { background: #111; width: 20px; border-radius: 3px; }
+  .right-controls { display: flex; align-items: center; gap: 12px; }
+  .counter { font-size: 12px; font-weight: 400; letter-spacing: 2px; color: #aaa; }
+  .counter span { color: #111; font-weight: 500; }
+  .arrows { display: flex; gap: 8px; }
+  .arrow { width: 36px; height: 36px; border: 1px solid #ddd; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; color: #111; border-radius: 2px; }
+  .arrow:hover { background: #111; border-color: #111; color: #fff; }
+  .arrow svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<div class="carousel-wrap">
+  <div class="carousel-viewport">
+    <div class="carousel-track" id="track">
+      <div class="slide"><img src="https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/9a88b6cc-44c9-4c48-9a63-462f7517fadc/Placeholder_images-11.png?t=1775328240" alt="vertical testing 2222"></div>
+      <div class="slide"><img src="https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/8e27f1f3-4953-487a-9ffe-40232e20b9c3/Placeholder_images-07.png?t=1775328244" alt="testing for testing"></div>
+      <div class="slide"><img src="https://beehiiv-images-production.s3.amazonaws.com/uploads/asset/file/8969cf50-00ae-4693-9f5f-a2fa2dacc071/Placeholder_images-13.png?t=1775328240" alt=""></div>
+    </div>
+  </div>
+  <div class="caption-area">
+    <p class="caption-sub" id="cap-sub">&nbsp;</p>
+  </div>
+  <div class="controls">
+    <div class="dots" id="dots"></div>
+    <div class="right-controls">
+      <div class="counter" id="counter"><span>1</span> / 3</div>
+      <div class="arrows">
+        <button class="arrow" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="arrow" id="next" aria-label="Next"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const total=3,captions=["vertical testing 2222","testing for testing",""];
+  const track=document.getElementById('track'),prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next'),dotsEl=document.getElementById('dots'),capSub=document.getElementById('cap-sub');
+  let current=0;
+  document.querySelectorAll('.slide img').forEach(img=>{const c=()=>{if(img.naturalWidth&&img.naturalHeight&&img.naturalWidth/img.naturalHeight>=1.1)img.classList.add('landscape')};img.complete?c():img.addEventListener('load',c)});
+  for(let i=0;i<total;i++){const d=document.createElement('button');d.className='dot'+(i===0?' active':'');d.setAttribute('aria-label',`Go to slide ${i+1}`);d.addEventListener('click',()=>goTo(i));dotsEl.appendChild(d)}
+  function updateUI(){track.style.transform=`translateX(-${current*100}%)`;const cap=captions[current];capSub.textContent=cap||'\u00A0';capSub.style.visibility=cap?'visible':'hidden';document.getElementById('counter').innerHTML=`<span>${current+1}</span> / ${total}`;document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));reportHeight()}
+  function goTo(i){current=((i%total)+total)%total;updateUI()}
+  prevBtn.addEventListener('click',()=>goTo(current-1));nextBtn.addEventListener('click',()=>goTo(current+1));
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')goTo(current-1);if(e.key==='ArrowRight')goTo(current+1)});
+  let tx=0;track.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});track.addEventListener('touchend',e=>{const d=tx-e.changedTouches[0].clientX;if(Math.abs(d)>40)goTo(current+(d>0?1:-1))});
+  function reportHeight(){window.parent.postMessage({type:'resize',height:document.body.scrollHeight},'*')}
+  window.addEventListener('load',reportHeight);new ResizeObserver(reportHeight).observe(document.body);
+  updateUI();
+</script>
+</body>
+</html>
